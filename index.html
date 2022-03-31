@@ -16,27 +16,54 @@
     let ctx=canvas.getContext("2d");
 
     let painting =false
+    let last
     
     ctx.fillStyle="black";
     ctx.strokeStyle="none";
+    ctx.lineWidth =8;
+    ctx.lineCap ="round";
 
-    canvas.onmousedown = ()=>{
-        painting = true
+    function drawline(x1,y1,x2,y2){
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.stroke();
     }
 
-    canvas.onmousemove = (e)=>{
+    let isTouchDevice = 'ontouchstart' in
+    document.documentElement;
+    if (isTouchDevice) {
+        canvas.ontouchstart =(e)=>{
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            last = [x,y]
+        }
+        canvas.ontouchmove = (e) => {
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            drawline(last[0],last[1],x,y)
+            last = [x,y]
+          
+    
+        }
+    } else {
+ 
+     canvas.onmousedown = (a)=>{
+        painting = true
+        last=[a.clientX,a.clientY]
+    }
+
+    canvas.onmousemove = (a)=>{
         if(painting=== true){
-            ctx.beginPath();
-            ctx.arc(e.clientX,e.clientY,10,0,2*Math.PI);
-            ctx.stroke();
-            ctx.fill();
-        }else{
-            console.log('1')
+            drawline(last[0],last[1],a.clientX,a.clientY)
+            last = [a.clientX,a.clientY]
         }
     }
     canvas.onmouseup=()=>{
         painting=false
     }
+}
+
 
 
 
